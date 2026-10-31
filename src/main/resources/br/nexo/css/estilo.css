@@ -1,0 +1,15 @@
+/* Estilo do Nexo Notepad. Comecem simples e evoluam depois que o CRUD funcionar. */
+
+.raiz {
+    -fx-font-size: 13px;
+}
+
+.painel-lateral {
+    -fx-background-color: #f3f3f3;
+    -fx-border-color: #dddddd;
+    -fx-border-width: 0 1 0 0;
+}
+
+.botao-principal {
+    -fx-font-weight: bold;
+}

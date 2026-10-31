@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Tela principal. Os fx:id precisam bater com os campos @FXML do MainController. -->
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="br.nexo.controller.MainController" styleClass="raiz">
+
+    <!-- ESQUERDA: pesquisa, filtro por categoria e lista de notas -->
+    <left>
+        <VBox spacing="8" prefWidth="280" styleClass="painel-lateral">
+            <padding>
+                <Insets top="12" right="12" bottom="12" left="12"/>
+            </padding>
+            <HBox spacing="6">
+                <TextField fx:id="campoPesquisa" promptText="Pesquisar notas..." HBox.hgrow="ALWAYS"/>
+                <Button text="Buscar" onAction="#aoPesquisar"/>
+            </HBox>
+            <ComboBox fx:id="comboFiltroCategoria" promptText="Todas as categorias"
+                      maxWidth="Infinity" onAction="#aoFiltrarCategoria"/>
+            <ListView fx:id="listaNotas" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="6">
+                <Button text="Nova nota" onAction="#aoNovaNota"/>
+                <Button text="Excluir" onAction="#aoExcluir"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- CENTRO: edição da nota -->
+    <center>
+        <VBox spacing="8">
+            <padding>
+                <Insets top="12" right="12" bottom="12" left="12"/>
+            </padding>
+            <Label text="Título"/>
+            <TextField fx:id="campoTitulo" promptText="Título da nota"/>
+            <Label text="Categoria"/>
+            <HBox spacing="6">
+                <ComboBox fx:id="comboCategoria" promptText="Sem categoria" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="Gerenciar categorias" onAction="#aoGerenciarCategorias"/>
+            </HBox>
+            <Label text="Conteúdo"/>
+            <TextArea fx:id="areaConteudo" wrapText="true" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="6">
+                <Button text="Salvar" onAction="#aoSalvar" styleClass="botao-principal"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>
