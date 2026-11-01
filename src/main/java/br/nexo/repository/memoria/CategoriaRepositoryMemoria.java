@@ -2,10 +2,8 @@ package br.nexo.repository.memoria;
 
 import br.nexo.model.Categoria;
 import br.nexo.repository.CategoriaRepository;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 
 /**
  * REPOSITORY EM MEMÓRIA (provisório, fase Java): guarda as categorias numa coleção.
@@ -25,36 +23,45 @@ public class CategoriaRepositoryMemoria implements CategoriaRepository {
     @Override
     public Categoria salvar(Categoria categoria) {
         // TODO: Gerar o id, guardar e devolver a categoria com id.
-        throw new UnsupportedOperationException("TODO: CategoriaRepositoryMemoria.salvar");
+        categoria.setId(proximoId++);
+        categorias.put(categoria.getId(), categoria);
+        return categoria;
     }
 
     @Override
     public void atualizar(Categoria categoria) {
         // TODO: Substituir a categoria guardada que tem o mesmo id.
-        throw new UnsupportedOperationException("TODO: CategoriaRepositoryMemoria.atualizar");
+        if (categorias.containsKey(categoria.getId())) {
+            categorias.put(categoria.getId(), categoria);
+        }
     }
 
     @Override
     public void excluir(int id) {
         // TODO: Remover a categoria com este id.
-        throw new UnsupportedOperationException("TODO: CategoriaRepositoryMemoria.excluir");
+        categorias.remove(id);
     }
 
     @Override
     public Optional<Categoria> buscarPorId(int id) {
         // TODO: Devolver Optional.ofNullable(...).
-        throw new UnsupportedOperationException("TODO: CategoriaRepositoryMemoria.buscarPorId");
+        return Optional.ofNullable(categorias.get(id));
     }
 
     @Override
     public Optional<Categoria> buscarPorNome(String nome) {
         // TODO: Comparar o nome (decidam: ignora maiúsculas?).
-        throw new UnsupportedOperationException("TODO: CategoriaRepositoryMemoria.buscarPorNome");
+        if (nome == null) {
+            return Optional.empty();
+        }
+        return categorias.values().stream()
+                .filter(c -> c.getNome().equalsIgnoreCase(nome.trim()))
+                .findFirst();
     }
 
     @Override
     public List<Categoria> listarTodas() {
         // TODO: Devolver uma CÓPIA da lista.
-        throw new UnsupportedOperationException("TODO: CategoriaRepositoryMemoria.listarTodas");
+        return new ArrayList<>(categorias.values());
     }
 }

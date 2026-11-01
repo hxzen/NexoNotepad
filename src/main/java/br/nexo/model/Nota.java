@@ -32,4 +32,57 @@ public class Nota {
     private Categoria categoria;
 
     // TODO: construtores, getters, setters necessários, toString
+
+    //Getters
+    public int getId(){return id;}
+    public String getTitulo(){return titulo;}
+    public String getConteudo(){return conteudo;}
+    public LocalDateTime getDataCriacao(){return dataCriacao;}
+    public LocalDateTime getDataEdicao(){return dataEdicao;}
+    public Categoria getCategoria(){return categoria;}
+
+    // Setters
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setConteudo(String conteudo) {
+        this.conteudo = conteudo;
+    }
+
+    public void setDataEdicao(LocalDateTime dataEdicao) {
+        this.dataEdicao = dataEdicao;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+    //Construtores
+    public Nota(String titulo, String conteudo, Categoria categoria) {
+        this.titulo = titulo;
+        this.conteudo = conteudo;
+        this.categoria = categoria;
+
+        this.dataCriacao = LocalDateTime.now();
+        this.dataEdicao = LocalDateTime.now();
+    }
+
+    public Nota(int id, String titulo, String conteudo,
+                LocalDateTime dataCriacao,
+                LocalDateTime dataEdicao,
+                Categoria categoria) {
+
+        this.id = id;
+        this.titulo = titulo;
+        this.conteudo = conteudo;
+        this.dataCriacao = dataCriacao;
+        this.dataEdicao = dataEdicao;
+        this.categoria = categoria;
+    }
+
+    @Override
+    public String toString(){
+        return titulo;
+    }
 }
