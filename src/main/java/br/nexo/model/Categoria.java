@@ -8,23 +8,46 @@ package br.nexo.model;
  *
  * O que já existe (do código de vocês): atributos privados, construtor e getters.
  *
- * TODO (vocês):
- *  - Um segundo construtor para categoria NOVA (ainda sem id). Qual tipo de id
- *    consegue representar "ainda não foi salva"?
- *  - Decidir a ordem dos parâmetros e usar a mesma em todas as classes.
- *  - Setter do nome (renomear)? O id deve ter setter?
- *  - toString(): o JavaFX usa para mostrar a categoria em listas e combos.
- *  - equals() e hashCode(): quando duas categorias são "a mesma"?
  */
 public class Categoria {
-    private int id;
+    private Integer id;
     private String nome;
 
-    public Categoria(String nome, int id) {
+    public Categoria(String nome, Integer id) {
         this.nome = nome;
         this.id = id;
     }
 
-    public int getId() { return id; }
+    public Categoria(String nome) {
+        this.nome = nome;
+    }
+
+    public Integer getId() { return id; }
     public String getNome() { return nome; }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return nome;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Categoria outra)) return false;
+        if (id == null || outra.id == null) return false;
+        return id.equals(outra.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id == null ? System.identityHashCode(this) : id.hashCode();
+    }
 }
