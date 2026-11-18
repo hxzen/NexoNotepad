@@ -22,7 +22,6 @@ public class CategoriaRepositoryMemoria implements CategoriaRepository {
 
     @Override
     public Categoria salvar(Categoria categoria) {
-        // TODO: Gerar o id, guardar e devolver a categoria com id.
         categoria.setId(proximoId++);
         categorias.put(categoria.getId(), categoria);
         return categoria;
@@ -30,7 +29,6 @@ public class CategoriaRepositoryMemoria implements CategoriaRepository {
 
     @Override
     public void atualizar(Categoria categoria) {
-        // TODO: Substituir a categoria guardada que tem o mesmo id.
         if (categorias.containsKey(categoria.getId())) {
             categorias.put(categoria.getId(), categoria);
         }
@@ -38,19 +36,16 @@ public class CategoriaRepositoryMemoria implements CategoriaRepository {
 
     @Override
     public void excluir(int id) {
-        // TODO: Remover a categoria com este id.
         categorias.remove(id);
     }
 
     @Override
     public Optional<Categoria> buscarPorId(int id) {
-        // TODO: Devolver Optional.ofNullable(...).
         return Optional.ofNullable(categorias.get(id));
     }
 
     @Override
     public Optional<Categoria> buscarPorNome(String nome) {
-        // TODO: Comparar o nome (decidam: ignora maiúsculas?).
         if (nome == null) {
             return Optional.empty();
         }
@@ -61,7 +56,6 @@ public class CategoriaRepositoryMemoria implements CategoriaRepository {
 
     @Override
     public List<Categoria> listarTodas() {
-        // TODO: Devolver uma CÓPIA da lista.
         return new ArrayList<>(categorias.values());
     }
 }
