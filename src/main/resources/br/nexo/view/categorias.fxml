@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="br.nexo.controller.CategoriasController"
+      spacing="8" prefWidth="360" prefHeight="420" styleClass="raiz">
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12"/>
+    </padding>
+    <Label text="Categorias"/>
+    <ListView fx:id="listaCategorias" VBox.vgrow="ALWAYS"/>
+    <TextField fx:id="campoNome" promptText="Nome da categoria"/>
+    <HBox spacing="6">
+        <Button text="Criar" onAction="#aoCriar" styleClass="botao-principal"/>
+        <Button text="Renomear" onAction="#aoRenomear"/>
+        <Button text="Excluir" onAction="#aoExcluir"/>
+    </HBox>
+    <Button text="Fechar" onAction="#aoFechar"/>
+</VBox>

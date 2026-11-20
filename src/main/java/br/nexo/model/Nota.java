@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  *  - equals()/hashCode() se precisarem comparar notas.
  */
 public class Nota {
-    private int id;
+    private Integer id;
     private String titulo;
     private String conteudo;
     private LocalDateTime dataCriacao;
@@ -56,6 +56,10 @@ public class Nota {
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     //Construtores

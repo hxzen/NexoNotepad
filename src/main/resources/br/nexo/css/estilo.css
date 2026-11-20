@@ -1,15 +1,44 @@
-/* Estilo do Nexo Notepad. Comecem simples e evoluam depois que o CRUD funcionar. */
+/* Tema do Nexo Notepad. Os nomes .raiz, .painel-lateral e .botao-principal
+   são as styleClass usadas no main.fxml. */
 
 .raiz {
     -fx-font-size: 13px;
+    -fx-background-color: #ffffff;
 }
 
 .painel-lateral {
-    -fx-background-color: #f3f3f3;
-    -fx-border-color: #dddddd;
+    -fx-background-color: #f4f5f7;
+    -fx-border-color: #dcdfe4;
     -fx-border-width: 0 1 0 0;
 }
 
+.button {
+    -fx-background-color: #e3e6ea;
+    -fx-background-radius: 4;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #d3d7dd;
+}
+
 .botao-principal {
+    -fx-background-color: #2f6fed;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
+}
+
+.botao-principal:hover {
+    -fx-background-color: #2459c7;
+}
+
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #dcdfe4;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #2f6fed;
+    -fx-text-fill: white;
 }

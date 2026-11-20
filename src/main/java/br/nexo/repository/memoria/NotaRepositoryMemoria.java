@@ -2,6 +2,8 @@ package br.nexo.repository.memoria;
 
 import br.nexo.model.Nota;
 import br.nexo.repository.NotaRepository;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,55 +21,70 @@ import java.util.Optional;
  */
 public class NotaRepositoryMemoria implements NotaRepository {
 
-    // Decisão de vocês: LinkedHashMap mantém a ordem de inserção; pensem se outra coleção serve melhor.
     private final Map<Integer, Nota> notas = new LinkedHashMap<>();
     private int proximoId = 1;
 
     @Override
     public Nota salvar(Nota nota) {
-        // TODO: Gerar o id (proximoId++), guardar e devolver a nota com id.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.salvar");
+        nota.setId(proximoId++);
+        notas.put(nota.getId(), nota);
+        return nota;
     }
 
     @Override
     public void atualizar(Nota nota) {
-        // TODO: Substituir a nota guardada que tem o mesmo id.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.atualizar");
+        if (notas.containsKey(nota.getId())) {
+            notas.put(nota.getId(), nota);
+        }
     }
 
     @Override
     public void excluir(int id) {
-        // TODO: Remover a nota com este id.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.excluir");
+        notas.remove(id);
     }
 
     @Override
     public Optional<Nota> buscarPorId(int id) {
-        // TODO: Devolver Optional.ofNullable(...) da coleção.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.buscarPorId");
+        return Optional.ofNullable(notas.get(id));
     }
 
     @Override
     public List<Nota> listarTodas() {
-        // TODO: Devolver uma CÓPIA da lista (não exponha a coleção interna).
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.listarTodas");
+        return new ArrayList<>(notas.values());
     }
 
     @Override
     public List<Nota> buscarPorTermo(String termo) {
-        // TODO: Filtrar por título OU conteúdo, ignorando maiúsculas.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.buscarPorTermo");
+        List<Nota> resultado = new ArrayList<>();
+        String busca = termo == null ? "" : termo.trim().toLowerCase();
+
+        for (Nota nota : notas.values()) {
+            String titulo = nota.getTitulo() == null ? "" : nota.getTitulo().toLowerCase();
+            String conteudo = nota.getConteudo() == null ? "" : nota.getConteudo().toLowerCase();
+
+            if (titulo.contains(busca) || conteudo.contains(busca)) {
+                resultado.add(nota);
+            }
+        }
+        return resultado;
     }
 
     @Override
     public List<Nota> listarPorCategoria(int categoriaId) {
-        // TODO: Filtrar as notas dessa categoria.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.listarPorCategoria");
+        List<Nota> resultado = new ArrayList<>();
+
+        for (Nota nota : notas.values()) {
+            if (nota.getCategoria() != null
+                    && nota.getCategoria().getId() != null
+                    && nota.getCategoria().getId().equals(categoriaId)) {
+                resultado.add(nota);
+            }
+        }
+        return resultado;
     }
 
     @Override
     public int contarPorCategoria(int categoriaId) {
-        // TODO: Contar as notas dessa categoria.
-        throw new UnsupportedOperationException("TODO: NotaRepositoryMemoria.contarPorCategoria");
+        return listarPorCategoria(categoriaId).size();
     }
 }

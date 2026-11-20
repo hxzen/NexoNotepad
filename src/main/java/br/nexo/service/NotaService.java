@@ -1,28 +1,24 @@
 package br.nexo.service;
 
+import br.nexo.exception.NaoEncontradoException;
+import br.nexo.exception.ValidacaoException;
 import br.nexo.model.Categoria;
 import br.nexo.model.Nota;
 import br.nexo.repository.CategoriaRepository;
 import br.nexo.repository.NotaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * SERVICE: regras de negócio das notas. É a "inteligência" do app.
- *
- * Recebe os repositories pela INTERFACE (nunca importe repository.memoria
- * nem repository.sqlite aqui) e NÃO usa nada de JavaFX.
- *
- * Responsabilidades:
- *  - Validar antes de qualquer chamada ao repository:
- *      título vazio ou só com espaços, tamanho máximo do título,
- *      categoria informada que não existe.
- *    Em caso de erro: lançar ValidacaoException com mensagem clara.
- *  - Definir a data de criação ao criar e atualizar a data de edição ao editar
- *    (decisão de vocês: quem atualiza, a Nota ou o service?).
- *  - Lançar NaoEncontradoException quando o id não existir.
+ * Camada de regras de negócio das notas.
+ * Valida os dados antes de chegar ao repository e não conhece JavaFX nem a
+ * implementação concreta do repository (só a interface).
  */
 public class NotaService {
+
+    private static final int TAMANHO_MAXIMO_TITULO = 100;
 
     private final NotaRepository notaRepository;
     private final CategoriaRepository categoriaRepository;
@@ -32,36 +28,85 @@ public class NotaService {
         this.categoriaRepository = categoriaRepository;
     }
 
-    /** Valida e cria uma nota nova. A categoria pode ser nula? (decisão de vocês) */
     public Nota criar(String titulo, String conteudo, Categoria categoria) {
-        throw new UnsupportedOperationException("TODO: NotaService.criar");
+        validarTitulo(titulo);
+        validarCategoria(categoria);
+
+        Nota nota = new Nota(titulo.trim(), textoOuVazio(conteudo), categoria);
+        return notaRepository.salvar(nota);
     }
 
-    /** Valida e edita uma nota existente, atualizando a data de edição. */
+    /** Edita a nota e atualiza a data de edição. */
     public Nota editar(int id, String titulo, String conteudo, Categoria categoria) {
-        throw new UnsupportedOperationException("TODO: NotaService.editar");
+        Nota nota = buscarPorId(id);
+        validarTitulo(titulo);
+        validarCategoria(categoria);
+
+        nota.setTitulo(titulo.trim());
+        nota.setConteudo(textoOuVazio(conteudo));
+        nota.setCategoria(categoria);
+        nota.setDataEdicao(LocalDateTime.now());
+
+        notaRepository.atualizar(nota);
+        return nota;
     }
 
-    /** Exclui a nota. (A confirmação com o usuário é do controller.) */
+    /** Confere se a nota existe antes de excluir, para não apagar "nada" em silêncio. */
     public void excluir(int id) {
-        throw new UnsupportedOperationException("TODO: NotaService.excluir");
+        buscarPorId(id);
+        notaRepository.excluir(id);
     }
 
-    /** Busca por id; lança NaoEncontradoException se não existir. */
+    /** Traduz o Optional vazio do repository em um erro compreensível. */
     public Nota buscarPorId(int id) {
-        throw new UnsupportedOperationException("TODO: NotaService.buscarPorId");
+        Optional<Nota> nota = notaRepository.buscarPorId(id);
+        if (nota.isEmpty()) {
+            throw new NaoEncontradoException("Nota não encontrada.");
+        }
+        return nota.get();
     }
 
     public List<Nota> listarTodas() {
-        throw new UnsupportedOperationException("TODO: NotaService.listarTodas");
+        return notaRepository.listarTodas();
     }
 
-    /** Pesquisa por título e conteúdo. Termo vazio: o que deve acontecer? */
+    /** Pesquisa vazia devolve todas as notas. */
     public List<Nota> pesquisar(String termo) {
-        throw new UnsupportedOperationException("TODO: NotaService.pesquisar");
+        if (termo == null || termo.trim().isEmpty()) {
+            return notaRepository.listarTodas();
+        }
+        return notaRepository.buscarPorTermo(termo.trim());
     }
 
+    /** Sem categoria escolhida, devolve todas as notas. */
     public List<Nota> listarPorCategoria(Categoria categoria) {
-        throw new UnsupportedOperationException("TODO: NotaService.listarPorCategoria");
+        if (categoria == null || categoria.getId() == null) {
+            return notaRepository.listarTodas();
+        }
+        return notaRepository.listarPorCategoria(categoria.getId());
+    }
+
+    private void validarTitulo(String titulo) {
+        if (titulo == null || titulo.trim().isEmpty()) {
+            throw new ValidacaoException("O título da nota é obrigatório.");
+        }
+        if (titulo.trim().length() > TAMANHO_MAXIMO_TITULO) {
+            throw new ValidacaoException(
+                    "O título pode ter no máximo " + TAMANHO_MAXIMO_TITULO + " caracteres.");
+        }
+    }
+
+    /** A categoria é opcional, mas se for informada precisa existir. */
+    private void validarCategoria(Categoria categoria) {
+        if (categoria == null) {
+            return;
+        }
+        if (categoria.getId() == null || categoriaRepository.buscarPorId(categoria.getId()).isEmpty()) {
+            throw new ValidacaoException("A categoria informada não existe.");
+        }
+    }
+
+    private String textoOuVazio(String texto) {
+        return texto == null ? "" : texto;
     }
 }

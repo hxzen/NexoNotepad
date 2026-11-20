@@ -1,26 +1,39 @@
 package br.nexo.util;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
+import java.util.Optional;
+
 /**
- * UTIL: atalhos para os pop-ups (javafx.scene.control.Alert) usados em várias
- * partes da interface. Evita repetir as mesmas linhas em todo método do controller.
- *
- * Só crie/mantenha esta classe se ela realmente for usada. Se ficar com
- * poucas linhas, pode viver dentro do controller.
+ * Pop-ups reutilizados pela interface, para os controllers não repetirem
+ * a configuração do Alert a cada uso.
  */
 public class Alertas {
 
-    /** Pop-up de erro com a mensagem (ex.: texto de uma ValidacaoException). */
     public static void erro(String mensagem) {
-        throw new UnsupportedOperationException("TODO: Alertas.erro");
+        mostrar(Alert.AlertType.ERROR, "Erro", mensagem);
     }
 
-    /** Pop-up informativo (ex.: "Nota salva com sucesso"). */
     public static void info(String mensagem) {
-        throw new UnsupportedOperationException("TODO: Alertas.info");
+        mostrar(Alert.AlertType.INFORMATION, "Aviso", mensagem);
     }
 
-    /** Pergunta Sim/Não e devolve true se o usuário confirmou (ex.: antes de excluir). */
+    /** Devolve true somente se o usuário clicar em "Sim". */
     public static boolean confirmar(String mensagem) {
-        throw new UnsupportedOperationException("TODO: Alertas.confirmar");
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION, mensagem, ButtonType.YES, ButtonType.NO);
+        alerta.setTitle("Confirmação");
+        alerta.setHeaderText(null);
+
+        Optional<ButtonType> resposta = alerta.showAndWait();
+        return resposta.isPresent() && resposta.get() == ButtonType.YES;
+    }
+
+    private static void mostrar(Alert.AlertType tipo, String titulo, String mensagem) {
+        Alert alerta = new Alert(tipo);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensagem);
+        alerta.showAndWait();
     }
 }
