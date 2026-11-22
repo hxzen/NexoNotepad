@@ -5,6 +5,7 @@ import br.nexo.exception.ValidacaoException;
 import br.nexo.model.Categoria;
 import br.nexo.repository.CategoriaRepository;
 import br.nexo.repository.NotaRepository;
+import br.nexo.util.Cores;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,9 @@ public class CategoriaService {
             throw new ValidacaoException("Já existe uma categoria com o nome \"" + nomeLimpo + "\".");
         }
 
-        return categoriaRepository.salvar(new Categoria(nomeLimpo));
+        Categoria nova = new Categoria(nomeLimpo);
+        nova.setCor(Cores.gerarAleatoria()); // cor sorteada UMA vez, ao criar; renomear não muda
+        return categoriaRepository.salvar(nova);
     }
 
     public Categoria renomear(int id, String novoNome) {

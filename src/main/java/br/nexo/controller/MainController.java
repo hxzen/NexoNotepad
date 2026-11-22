@@ -7,6 +7,7 @@ import br.nexo.model.Nota;
 import br.nexo.service.CategoriaService;
 import br.nexo.service.NotaService;
 import br.nexo.util.Alertas;
+import br.nexo.util.Cores;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -22,7 +23,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -342,32 +342,22 @@ public class MainController {
         };
     }
 
-    /** Etiqueta arredondada com o nome da categoria (cinza quando não tem categoria). */
+    /** Etiqueta arredondada com o nome da categoria, na cor dela (cinza quando não tem categoria). */
     private Label criarEtiquetaCategoria(Categoria categoria) {
         Label etiqueta;
-        String cor;
+        String corFundo;
         if (categoria == null) {
             etiqueta = new Label("Sem categoria");
-            cor = "#9E9E9E";
+            corFundo = Cores.CINZA;
         } else {
             etiqueta = new Label(categoria.getNome());
-            cor = corDaCategoria(categoria);
+            corFundo = categoria.getCor() != null ? categoria.getCor() : Cores.CINZA;
         }
 
-        etiqueta.setStyle("-fx-background-color: " + cor + "; -fx-text-fill: white;"
+        // Texto branco ou preto, o que tiver mais contraste com o fundo: sempre legível.
+        etiqueta.setStyle("-fx-background-color: " + corFundo + "; -fx-text-fill: " + Cores.corDoTexto(corFundo) + ";"
                 + " -fx-background-radius: 10; -fx-padding: 1 8 1 8; -fx-font-size: 11px;");
         return etiqueta;
-    }
-
-    /** Cada categoria ganha sempre a mesma cor, calculada a partir do id dela. */
-    private String corDaCategoria(Categoria categoria) {
-        long base = categoria.getId() != null ? categoria.getId() : categoria.getNome().hashCode();
-        double matiz = Math.abs(base * 47L) % 360;
-        Color cor = Color.hsb(matiz, 0.60, 0.70);
-        return String.format("#%02X%02X%02X",
-                Math.round(cor.getRed() * 255),
-                Math.round(cor.getGreen() * 255),
-                Math.round(cor.getBlue() * 255));
     }
 
     /** Mostra "Criada em ... • Editada em ..." no painel de edição (se o label existir no FXML). */

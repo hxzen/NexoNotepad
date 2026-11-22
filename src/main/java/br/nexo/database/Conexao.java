@@ -1,13 +1,19 @@
 package br.nexo.database;
 
+import br.nexo.util.Cores;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DATABASE: ponto único de acesso ao SQLite.
@@ -19,6 +25,7 @@ import java.sql.Statement;
  *  - Chaves estrangeiras ligadas em TODA conexão (no SQLite vêm desligadas e
  *    o PRAGMA vale só para a conexão em que foi executado).
  */
+@SuppressWarnings({"SqlResolve", "SqlNoDataSourceInspection"}) // avisos da IDE: ela não conhece o banco
 public class Conexao {
 
     private static final Path ARQUIVO_BANCO =
@@ -43,13 +50,14 @@ public class Conexao {
         return conexao;
     }
 
-    /** Cria as tabelas (notas e categorias) se ainda não existirem. */
+    /** Cria as tabelas (notas e categorias) se ainda não existirem e atualiza bancos antigos. */
     public static void criarTabelas() {
         try (Connection conexao = obter(); Statement st = conexao.createStatement()) {
             st.execute("""
                     CREATE TABLE IF NOT EXISTS categorias (
                         id   INTEGER PRIMARY KEY AUTOINCREMENT,
-                        nome TEXT NOT NULL
+                        nome TEXT NOT NULL,
+                        cor  TEXT
                     )
                     """);
 
@@ -64,8 +72,45 @@ public class Conexao {
                         FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT
                     )
                     """);
+
+            garantirCoresDasCategorias(conexao, st);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao criar as tabelas do banco de dados.", e);
+        }
+    }
+
+    /**
+     * Para bancos criados ANTES da cor existir: adiciona a coluna "cor" se faltar
+     * e sorteia uma cor para cada categoria que ainda não tem.
+     */
+    private static void garantirCoresDasCategorias(Connection conexao, Statement st) throws SQLException {
+        boolean temColunaCor = false;
+        try (ResultSet rs = st.executeQuery("PRAGMA table_info(categorias)")) {
+            while (rs.next()) {
+                if ("cor".equalsIgnoreCase(rs.getString("name"))) {
+                    temColunaCor = true;
+                }
+            }
+        }
+        if (!temColunaCor) {
+            st.execute("ALTER TABLE categorias ADD COLUMN cor TEXT");
+        }
+
+        List<Integer> semCor = new ArrayList<>();
+        try (ResultSet rs = st.executeQuery("SELECT id FROM categorias WHERE cor IS NULL")) {
+            while (rs.next()) {
+                semCor.add(rs.getInt("id"));
+            }
+        }
+
+        if (!semCor.isEmpty()) {
+            try (PreparedStatement ps = conexao.prepareStatement("UPDATE categorias SET cor = ? WHERE id = ?")) {
+                for (int id : semCor) {
+                    ps.setString(1, Cores.gerarAleatoria());
+                    ps.setInt(2, id);
+                    ps.executeUpdate();
+                }
+            }
         }
     }
 }

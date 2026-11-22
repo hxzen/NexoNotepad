@@ -27,12 +27,13 @@ import java.util.Optional;
  *
  * As datas são guardadas como texto ISO-8601 (ex.: 2026-11-21T14:30:00).
  */
+@SuppressWarnings({"SqlResolve", "SqlNoDataSourceInspection"}) // avisos da IDE: ela não conhece o banco
 public class NotaRepositorySqlite implements NotaRepository {
 
     /** Consulta base: a nota + a categoria dela (LEFT JOIN, pois a categoria é opcional). */
     private static final String SELECT_BASE = """
             SELECT n.id, n.titulo, n.conteudo, n.data_criacao, n.data_edicao,
-                   c.id AS categoria_id, c.nome AS categoria_nome
+                   c.id AS categoria_id, c.nome AS categoria_nome, c.cor AS categoria_cor
             FROM notas n
             LEFT JOIN categorias c ON c.id = n.categoria_id
             """;
@@ -175,7 +176,10 @@ public class NotaRepositorySqlite implements NotaRepository {
         Categoria categoria = null;
         int categoriaId = rs.getInt("categoria_id");
         if (!rs.wasNull()) {
-            categoria = new Categoria(rs.getString("categoria_nome"), categoriaId);
+            categoria = new Categoria(
+                    rs.getString("categoria_nome"),
+                    categoriaId,
+                    rs.getString("categoria_cor"));
         }
 
         return new Nota(

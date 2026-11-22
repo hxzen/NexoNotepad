@@ -6,12 +6,19 @@ package br.nexo.model;
  * Só guarda dados e sabe se descrever. NÃO acessa banco, NÃO usa JavaFX
  * e NÃO faz validação de regra de negócio (isso é do CategoriaService).
  *
- * O que já existe (do código de vocês): atributos privados, construtor e getters.
- *
+ * A cor é um texto hexadecimal ("#RRGGBB"), sorteada pelo service ao criar
+ * a categoria e guardada no banco.
  */
 public class Categoria {
     private Integer id;
     private String nome;
+    private String cor;
+
+    public Categoria(String nome, Integer id, String cor) {
+        this.nome = nome;
+        this.id = id;
+        this.cor = cor;
+    }
 
     public Categoria(String nome, Integer id) {
         this.nome = nome;
@@ -24,6 +31,7 @@ public class Categoria {
 
     public Integer getId() { return id; }
     public String getNome() { return nome; }
+    public String getCor() { return cor; }
 
     public void setNome(String nome) {
         this.nome = nome;
@@ -31,6 +39,10 @@ public class Categoria {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public void setCor(String cor) {
+        this.cor = cor;
     }
 
     @Override

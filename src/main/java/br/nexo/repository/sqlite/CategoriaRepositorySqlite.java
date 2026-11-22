@@ -21,14 +21,16 @@ import java.util.Optional;
  *  - Transforma falhas de banco em RuntimeException com mensagem compreensível.
  *  - NÃO valida nada (isso é do service).
  */
+@SuppressWarnings({"SqlResolve", "SqlNoDataSourceInspection"}) // avisos da IDE: ela não conhece o banco
 public class CategoriaRepositorySqlite implements CategoriaRepository {
 
     @Override
     public Categoria salvar(Categoria categoria) {
-        String sql = "INSERT INTO categorias (nome) VALUES (?)";
+        String sql = "INSERT INTO categorias (nome, cor) VALUES (?, ?)";
         try (Connection conexao = Conexao.obter();
              PreparedStatement ps = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, categoria.getNome());
+            ps.setString(2, categoria.getCor());
             ps.executeUpdate();
 
             try (ResultSet chaves = ps.getGeneratedKeys()) {
@@ -44,11 +46,12 @@ public class CategoriaRepositorySqlite implements CategoriaRepository {
 
     @Override
     public void atualizar(Categoria categoria) {
-        String sql = "UPDATE categorias SET nome = ? WHERE id = ?";
+        String sql = "UPDATE categorias SET nome = ?, cor = ? WHERE id = ?";
         try (Connection conexao = Conexao.obter();
              PreparedStatement ps = conexao.prepareStatement(sql)) {
             ps.setString(1, categoria.getNome());
-            ps.setInt(2, categoria.getId());
+            ps.setString(2, categoria.getCor());
+            ps.setInt(3, categoria.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar a categoria no banco de dados.", e);
@@ -69,7 +72,7 @@ public class CategoriaRepositorySqlite implements CategoriaRepository {
 
     @Override
     public Optional<Categoria> buscarPorId(int id) {
-        String sql = "SELECT id, nome FROM categorias WHERE id = ?";
+        String sql = "SELECT id, nome, cor FROM categorias WHERE id = ?";
         try (Connection conexao = Conexao.obter();
              PreparedStatement ps = conexao.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -87,7 +90,7 @@ public class CategoriaRepositorySqlite implements CategoriaRepository {
             return Optional.empty();
         }
 
-        String sql = "SELECT id, nome FROM categorias WHERE nome = ? COLLATE NOCASE";
+        String sql = "SELECT id, nome, cor FROM categorias WHERE nome = ? COLLATE NOCASE";
         try (Connection conexao = Conexao.obter();
              PreparedStatement ps = conexao.prepareStatement(sql)) {
             ps.setString(1, nome.trim());
@@ -101,7 +104,7 @@ public class CategoriaRepositorySqlite implements CategoriaRepository {
 
     @Override
     public List<Categoria> listarTodas() {
-        String sql = "SELECT id, nome FROM categorias ORDER BY id";
+        String sql = "SELECT id, nome, cor FROM categorias ORDER BY id";
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conexao = Conexao.obter();
              PreparedStatement ps = conexao.prepareStatement(sql);
@@ -117,6 +120,6 @@ public class CategoriaRepositorySqlite implements CategoriaRepository {
 
     /** Converte a linha do banco em objeto. */
     private Categoria mapear(ResultSet rs) throws SQLException {
-        return new Categoria(rs.getString("nome"), rs.getInt("id"));
+        return new Categoria(rs.getString("nome"), rs.getInt("id"), rs.getString("cor"));
     }
 }
