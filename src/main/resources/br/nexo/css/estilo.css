@@ -1,44 +1,87 @@
-/* Tema do Nexo Notepad. Os nomes .raiz, .painel-lateral e .botao-principal
-   são as styleClass usadas no main.fxml. */
+/* NexoNotepad tema */
+
+.root {
+    -fx-base: #1b1c23;
+    -fx-background: #14151a;
+    -fx-control-inner-background: #23252e;
+    -fx-control-inner-background-alt: #23252e;
+    -fx-text-base-color: #e6e8ee;
+    -fx-text-inner-color: #e6e8ee;
+    -fx-text-box-border: #2e313c;
+    -fx-accent: #3f6fe0;
+    -fx-selection-bar: #3f6fe0;
+    -fx-selection-bar-non-focused: #34519a;
+    -fx-cell-hover-color: #2a2d3a;
+    -fx-focus-color: #6b93f5;
+    -fx-faint-focus-color: transparent;
+    -fx-font-size: 13px;
+}
 
 .raiz {
-    -fx-font-size: 13px;
-    -fx-background-color: #ffffff;
+    -fx-background-color: #14151a;
 }
 
 .painel-lateral {
-    -fx-background-color: #f4f5f7;
-    -fx-border-color: #dcdfe4;
+    -fx-background-color: #1b1c23;
+    -fx-border-color: #2e313c;
     -fx-border-width: 0 1 0 0;
 }
 
+.label {
+    -fx-text-fill: #aab0bf;
+}
+
+.text-input {
+    -fx-prompt-text-fill: #6b7080;
+}
+
+.text-field {
+    -fx-background-radius: 6, 5;
+}
+
+.list-cell {
+    -fx-padding: 8 10 8 10;
+}
+
 .button {
-    -fx-background-color: #e3e6ea;
-    -fx-background-radius: 4;
-    -fx-padding: 6 14 6 14;
+    -fx-background-color: #2a2d38;
+    -fx-background-radius: 6;
+    -fx-text-fill: #e6e8ee;
+    -fx-padding: 7 14 7 14;
     -fx-cursor: hand;
 }
 
 .button:hover {
-    -fx-background-color: #d3d7dd;
+    -fx-background-color: #343845;
+}
+
+.button:pressed {
+    -fx-background-color: #3d4150;
 }
 
 .botao-principal {
-    -fx-background-color: #2f6fed;
+    -fx-background-color: #3f6fe0;
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
 .botao-principal:hover {
-    -fx-background-color: #2459c7;
+    -fx-background-color: #5282f0;
 }
 
-.list-view {
-    -fx-background-color: white;
-    -fx-border-color: #dcdfe4;
+.botao-principal:pressed {
+    -fx-background-color: #3260c9;
 }
 
-.list-cell:filled:selected {
-    -fx-background-color: #2f6fed;
-    -fx-text-fill: white;
+.combo-box .list-cell {
+    -fx-text-fill: #e6e8ee;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #23252e;
+    -fx-border-color: #2e313c;
+}
+
+.combo-box-popup .list-cell {
+    -fx-text-fill: #e6e8ee;
 }
