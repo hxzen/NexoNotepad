@@ -15,18 +15,26 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * PONTO DE ENTRADA e ÚNICO lugar que conhece as implementações concretas.
- *
- * O que ela faz:
- *  0. Garante que o banco e as tabelas existem (Conexao.criarTabelas()).
- *  1. Cria os repositories (hoje em SQLITE; para voltar à memória, troque só estas linhas).
- *  2. Cria os services, entregando a eles os repositories.
- *  3. Carrega o main.fxml e entrega os services ao MainController (controller factory).
- *  4. Aplica o CSS e mostra a janela.
- *
- * Regra: nenhuma regra de negócio aqui. Só "montar as peças".
- */
+/*
+Ponto de entrada do programa e o único lugar que conhece as implementações concretas.
+Não tem regra de negócio, só monta as peças na ordem certa e abre a janela:
+
+1. Chama Conexao.criarTabelas() para garantir que o banco e as tabelas existem. Precisa
+vir primeiro, porque a tela já consulta as categorias assim que carrega.
+
+2. Cria os repositories, hoje os do SQLite. Para voltar à versão em memória, basta
+trocar essas duas linhas, porque as duas implementam a mesma interface.
+
+3. Cria os services, entregando a cada um os repositories de que precisa.
+
+4. Carrega o main.fxml e entrega os services ao MainController por meio de um controller
+factory, já que o controller recebe os services pelo construtor.
+
+5. Aplica o CSS (estilo.css), define o título e mostra a janela.
+
+A classe estende Application, que é a base de todo programa JavaFX. O metodo start monta
+e abre a janela, e o main só chama o launch, que inicia o JavaFX.
+*/
 public class App extends Application {
 
     @Override

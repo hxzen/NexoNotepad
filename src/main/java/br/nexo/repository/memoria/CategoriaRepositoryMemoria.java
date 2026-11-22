@@ -5,16 +5,14 @@ import br.nexo.repository.CategoriaRepository;
 
 import java.util.*;
 
-/**
- * REPOSITORY EM MEMÓRIA (provisório, fase Java): guarda as categorias numa coleção.
- * Os dados somem ao fechar o app, e tudo bem nesta fase.
- *
- * Papéis:
- *  - Implementar CategoriaRepository.
- *  - SIMULAR o banco gerando o id das categorias novas (o SQLite fará isso depois).
- *
- * NÃO valida nada (isso é do service). Será substituído pelo CategoriaRepositorySqlite.
- */
+/*
+Repository de categorias que guarda os dados em memória, num Map que usa o id como
+chave. Implementa a interface CategoriaRepository e faz o papel do banco: gera o id de
+cada categoria nova, salva, atualiza, exclui e busca por id ou por nome (ignorando
+maiúsculas e minúsculas). Não valida nada, porque as regras ficam no service. Os dados
+somem quando o app fecha, por isso ele foi usado na fase Java, antes do SQLite, e a
+versão com banco implementa a mesma interface.
+*/
 public class CategoriaRepositoryMemoria implements CategoriaRepository {
 
     private final Map<Integer, Categoria> categorias = new LinkedHashMap<>();

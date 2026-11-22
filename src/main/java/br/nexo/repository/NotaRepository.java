@@ -11,8 +11,6 @@ import java.util.Optional;
  * É uma INTERFACE: não diz COMO guardar (memória, SQLite...), só O QUÊ.
  * O NotaService conhece apenas esta interface. Por isso, trocar a
  * implementação em memória pela do SQLite não muda o service.
- *
- * Regra: repository só PERSISTE. Nenhuma validação de regra aqui.
  */
 public interface NotaRepository {
 

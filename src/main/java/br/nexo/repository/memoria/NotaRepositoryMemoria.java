@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * REPOSITORY EM MEMÓRIA (provisório, fase Java): guarda as notas numa coleção.
- * Os dados somem ao fechar o app, e tudo bem nesta fase.
- *
- * Papéis:
- *  - Implementar NotaRepository.
- *  - SIMULAR o banco gerando o id das notas novas (o SQLite fará isso depois).
- *
- * NÃO valida nada (isso é do service). Será substituído pelo NotaRepositorySqlite.
- */
+/*
+Repository de notas que guarda os dados em memória, num Map que usa o id como chave.
+Implementa a interface NotaRepository e faz o papel do banco: gera o id de cada nota
+nova, salva, atualiza, exclui e busca por id. Também pesquisa notas por um termo, que
+pode estar no título ou no conteúdo (ignorando maiúsculas e minúsculas), lista as notas
+de uma categoria e conta quantas notas usam uma categoria, o que o service usa para
+impedir a exclusão de uma categoria em uso. Não valida nada, porque as regras ficam no
+service. Os dados somem quando o app fecha, por isso ele foi usado na fase Java, antes
+do SQLite, e a versão com banco implementa a mesma interface.
+*/
 public class NotaRepositoryMemoria implements NotaRepository {
 
     private final Map<Integer, Nota> notas = new LinkedHashMap<>();

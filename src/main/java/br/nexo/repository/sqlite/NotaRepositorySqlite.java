@@ -16,17 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * REPOSITORY SQLITE: mesma interface NotaRepository, guardando no banco via JDBC (Conexao).
- *
- *  - Converte a linha do banco em objeto (mapear) e o objeto em linha (parâmetros do SQL).
- *  - Usa PreparedStatement (nunca concatena texto em SQL).
- *  - Fecha os recursos com try-with-resources.
- *  - Transforma falhas de banco em RuntimeException com mensagem compreensível.
- *  - NÃO valida nada (isso é do service).
- *
- * As datas são guardadas como texto ISO-8601 (ex.: 2026-11-21T14:30:00).
- */
+/*
+Repository de notas que guarda os dados no banco SQLite. Implementa a mesma interface
+NotaRepository da versão em memória, então o service não precisa saber qual das duas
+está sendo usada. Salva, atualiza, exclui, busca por id, lista todas, pesquisa por
+termo no título ou no conteúdo, lista as notas de uma categoria e conta quantas notas
+usam uma categoria. Cada operação abre uma conexão pela classe Conexao.
+
+Para ler as notas, usa uma consulta base com LEFT JOIN, que traz junto os dados da
+categoria de cada nota e mantém as notas sem categoria. O método mapear converte cada
+linha do banco em um objeto Nota, montando a Categoria quando existe. As datas são
+guardadas como texto no formato ISO (por exemplo, 2026-11-21T14:30:00) e convertidas de
+volta para LocalDateTime ao ler. Na pesquisa, os caracteres especiais do LIKE (% e _)
+são escapados para o usuário poder buscar esses símbolos literalmente.
+
+Os comandos SQL usam PreparedStatement, que envia os valores separados do texto do
+comando e evita erros com aspas e SQL injection, e os recursos são fechados
+automaticamente com try-with-resources. Se o banco falhar, o erro vira uma
+RuntimeException com mensagem compreensível. Não valida nada, porque as regras ficam no
+service.
+*/
 @SuppressWarnings({"SqlResolve", "SqlNoDataSourceInspection"}) // avisos da IDE: ela não conhece o banco
 public class NotaRepositorySqlite implements NotaRepository {
 

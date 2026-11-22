@@ -15,16 +15,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DATABASE: ponto único de acesso ao SQLite.
- *
- * DECISÕES:
- *  - O arquivo .db fica na pasta do usuário (~/.nexo/nexo.db), que existe em
- *    qualquer computador e não depende de onde o app foi executado.
- *  - Uma conexão NOVA por operação: quem chama obter() fecha com try-with-resources.
- *  - Chaves estrangeiras ligadas em TODA conexão (no SQLite vêm desligadas e
- *    o PRAGMA vale só para a conexão em que foi executado).
- */
+/*
+Ponto único de acesso ao banco SQLite. Abre a conexão com o arquivo nexo.db, que fica
+na pasta do usuário (~/.nexo), e cria essa pasta se ela ainda não existir. Em toda
+conexão liga as chaves estrangeiras, que no SQLite vêm desligadas, para a nota só poder
+apontar para uma categoria que existe. Também cria as tabelas de categorias e de notas
+na primeira execução e atualiza bancos antigos, adicionando a coluna de cor e sorteando
+uma cor para as categorias que ainda não tinham. Cada operação abre uma conexão nova, e
+quem a recebe é responsável por fechar.
+*/
+
 @SuppressWarnings({"SqlResolve", "SqlNoDataSourceInspection"}) // avisos da IDE: ela não conhece o banco
 public class Conexao {
 

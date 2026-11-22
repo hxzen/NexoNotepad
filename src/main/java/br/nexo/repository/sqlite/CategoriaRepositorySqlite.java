@@ -13,14 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * REPOSITORY SQLITE: mesma interface CategoriaRepository, guardando no banco via JDBC.
- *
- *  - Usa PreparedStatement (nunca concatena texto em SQL).
- *  - Fecha os recursos com try-with-resources.
- *  - Transforma falhas de banco em RuntimeException com mensagem compreensível.
- *  - NÃO valida nada (isso é do service).
- */
+/*
+Repository de categorias que guarda os dados no banco SQLite. Implementa a mesma
+interface CategoriaRepository da versão em memória, então o service não precisa saber
+qual das duas está sendo usada. Salva, atualiza, exclui, busca por id ou por nome
+(ignorando maiúsculas e minúsculas) e lista as categorias, cada operação abrindo uma
+conexão pela classe Conexao. Ao salvar, pega o id gerado pelo banco e entrega à
+categoria. Os comandos SQL usam PreparedStatement, que envia os valores separados do
+texto do comando e evita erros com aspas e SQL injection, e os recursos são fechados
+automaticamente com try-with-resources. Se o banco falhar, o erro vira uma
+RuntimeException com mensagem compreensível. Não valida nada, porque as regras ficam no
+service.
+*/
 @SuppressWarnings({"SqlResolve", "SqlNoDataSourceInspection"}) // avisos da IDE: ela não conhece o banco
 public class CategoriaRepositorySqlite implements CategoriaRepository {
 

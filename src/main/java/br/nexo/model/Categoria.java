@@ -1,14 +1,13 @@
 package br.nexo.model;
 
-/**
- * MODEL: representa uma categoria de notas (ex.: "Estudos", "Ideias").
- *
- * Só guarda dados e sabe se descrever. NÃO acessa banco, NÃO usa JavaFX
- * e NÃO faz validação de regra de negócio (isso é do CategoriaService).
- *
- * A cor é um texto hexadecimal ("#RRGGBB"), sorteada pelo service ao criar
- * a categoria e guardada no banco.
- */
+/*
+Classe de modelo que representa uma categoria de notas, como "Estudos" ou "Ideias".
+Guarda o id, o nome e a cor (um texto hexadecimal no formato #RRGGBB, usada na etiqueta
+colorida da nota). Só guarda dados: não acessa banco, não usa JavaFX e não valida nada,
+porque as regras ficam no CategoriaService. O id fica vazio (null) enquanto a categoria
+não foi salva. Duas categorias são consideradas iguais quando têm o mesmo id, e o
+toString devolve o nome, que é o que aparece nas listas e nos combos.
+*/
 public class Categoria {
     private Integer id;
     private String nome;

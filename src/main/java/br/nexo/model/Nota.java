@@ -2,27 +2,14 @@ package br.nexo.model;
 
 import java.time.LocalDateTime;
 
-/**
- * MODEL: representa uma nota.
- *
- * Só guarda dados e sabe se descrever. NÃO acessa banco, NÃO usa JavaFX
- * e NÃO valida regra de negócio (isso é do NotaService).
- *
- * Campos sugeridos (as decisões abaixo são de vocês):
- *  - id            (identificador; ver decisão sobre o tipo na Categoria)
- *  - titulo        (obrigatório, validado no service)
- *  - conteudo
- *  - dataCriacao   (definida uma vez, ao criar)
- *  - dataEdicao    (atualizada a cada edição)
- *  - categoria     (objeto Categoria ou só categoriaId? obrigatória ou opcional?)
- *
- * TODO (vocês):
- *  - Atributos privados + getters (setters só onde fizer sentido: dataCriacao deve ter?).
- *  - Construtor para nota NOVA (sem id, datas de agora).
- *  - Construtor para nota JÁ EXISTENTE (com id e datas, como virá do repository).
- *  - toString(): normalmente o título, pois a ListView usa isso.
- *  - equals()/hashCode() se precisarem comparar notas.
- */
+/*
+Classe de modelo que representa uma nota. Guarda o id, o título, o conteúdo, a data de
+criação, a data de edição e a categoria (opcional, pode ser null). Só guarda dados: não
+acessa banco, não usa JavaFX e não valida nada, porque as regras ficam no NotaService.
+Tem dois construtores: um para nota nova, que ainda não tem id e já nasce com as datas de
+agora, e outro para nota que vem do banco, com id e datas já existentes. O toString
+devolve o título, que é o que a lista de notas usa para mostrar cada item.
+*/
 public class Nota {
     private Integer id;
     private String titulo;
@@ -34,7 +21,7 @@ public class Nota {
     // TODO: construtores, getters, setters necessários, toString
 
     //Getters
-    public int getId(){return id;}
+    public Integer getId(){return id;}
     public String getTitulo(){return titulo;}
     public String getConteudo(){return conteudo;}
     public LocalDateTime getDataCriacao(){return dataCriacao;}

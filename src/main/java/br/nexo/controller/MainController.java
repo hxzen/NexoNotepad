@@ -30,29 +30,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * CONTROLLER da tela principal (main.fxml).
- *
- * Papel: traduzir o que o usuário faz na tela em chamadas ao SERVICE e
- * mostrar o resultado (ou o erro) na tela.
- *
- * Regras:
- *  - SEM SQL e SEM regra de negócio aqui.
- *  - Não fala com o repository, só com os services.
- *  - Captura ValidacaoException / NaoEncontradoException e mostra a mensagem
- *    num Alert (use a classe util.Alertas).
- *  - Pergunta "tem certeza?" antes de excluir.
- *
- * Os campos @FXML abaixo precisam ter EXATAMENTE o mesmo nome do fx:id no main.fxml.
- */
+/*
+Controller da tela principal (main.fxml). Liga a tela aos services (NotaService e
+CategoriaService): pega o que o usuário digitou ou clicou e mostra o resultado. Não tem
+SQL nem regra de negócio, só trata a interface. Os conceitos de @FXML, initialize,
+lambda e try/catch estão explicados no CategoriasController.
+*/
 public class MainController {
 
     private final NotaService notaService;
     private final CategoriaService categoriaService;
 
-    // Nota que está aberta no painel de edição (null = nota nova).
+    // Nota que está aberta no painel de edição (null = nota nova). É isso que faz o mesmo
+    // botão Salvar servir para criar e para editar.
     private Nota notaSelecionada;
 
+    // static final é uma constante da classe, criada uma vez só. O DateTimeFormatter
+    // define como a data vira texto: "dd/MM/yyyy HH:mm" aparece como 22/11/2026 14:30.
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // --- Painel esquerdo: pesquisa, filtro e lista ---
@@ -74,7 +68,9 @@ public class MainController {
     /** Chamado pelo JavaFX depois que o FXML carrega: preencher lista e combos. */
     @FXML
     private void initialize() {
-        // O combo de filtro tem um item null que aparece como "Todas as categorias".
+        // setCellFactory diz como criar as células (as linhas) do combo, e setButtonCell
+        // cuida da célula que aparece com o combo fechado. Sem isso, o item null
+        // apareceria em branco. O item null aparece como "Todas as categorias".
         comboFiltroCategoria.setCellFactory(lv -> criarCelulaCategoria("Todas as categorias"));
         comboFiltroCategoria.setButtonCell(criarCelulaCategoria("Todas as categorias"));
 
@@ -89,6 +85,7 @@ public class MainController {
         listaNotas.setCellFactory(lv -> criarCelulaNota());
 
         // Ao selecionar uma nota na lista, mostra os dados nos campos de edição.
+        // (Mesmo mecanismo de listener explicado no CategoriasController.)
         listaNotas.getSelectionModel().selectedItemProperty().addListener((obs, antiga, nova) -> {
             if (nova != null) {
                 mostrarNota(nova);
@@ -104,7 +101,9 @@ public class MainController {
         campoTitulo.clear();
         areaConteudo.clear();
         mostrarDatas(null);
-        comboCategoria.getSelectionModel().selectFirst(); // "Sem categoria"
+        // selectFirst seleciona o primeiro item do combo, que é o null ("Sem categoria").
+        comboCategoria.getSelectionModel().selectFirst();
+        // requestFocus coloca o cursor no campo de título, pronto para digitar.
         campoTitulo.requestFocus();
     }
 
@@ -117,12 +116,15 @@ public class MainController {
 
         try {
             Nota salva;
+            // Quem decide entre criar e editar é a notaSelecionada: null é nota nova.
             if (notaSelecionada == null) {
                 salva = notaService.criar(titulo, conteudo, categoria);
             } else {
                 salva = notaService.editar(notaSelecionada.getId(), titulo, conteudo, categoria);
             }
 
+            // Depois de salvar, recarrega a lista e seleciona de novo a nota salva, para
+            // ela continuar aberta no formulário.
             recarregarNotas();
             selecionarNotaPorId(salva.getId());
         } catch (ValidacaoException | NaoEncontradoException e) {
@@ -147,6 +149,7 @@ public class MainController {
         try {
             notaService.excluir(notaSelecionada.getId());
             recarregarNotas();
+            // Depois de excluir, limpa o formulário.
             aoNovaNota();
         } catch (ValidacaoException | NaoEncontradoException e) {
             Alertas.erro(e.getMessage());
@@ -168,6 +171,8 @@ public class MainController {
     /** Abre a gestão de categorias (criar, renomear, excluir). */
     @FXML
     private void aoGerenciarCategorias() {
+        // Dialog é uma janela de diálogo do JavaFX. O <Void> diz que ela não devolve
+        // resultado nenhum. O ButtonType.CLOSE adiciona o botão de fechar.
         Dialog<Void> dialogo = new Dialog<>();
         dialogo.setTitle("Categorias");
         dialogo.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
@@ -176,6 +181,8 @@ public class MainController {
                 FXCollections.observableArrayList(categoriaService.listarTodas()));
         lista.setPrefHeight(220);
 
+        // Runnable é um bloco de código guardado numa variável para rodar depois, com
+        // .run(). Aqui evita repetir a linha de recarregar a lista em cada botão.
         // Atualiza a lista do diálogo depois de cada mudança.
         Runnable recarregarLista = () ->
                 lista.setItems(FXCollections.observableArrayList(categoriaService.listarTodas()));
@@ -184,6 +191,9 @@ public class MainController {
         Button botaoRenomear = new Button("Renomear");
         Button botaoExcluir = new Button("Excluir");
 
+        // setOnAction define o que acontece quando o botão é clicado. O "e" é o evento,
+        // que aqui não usamos. O ifPresent só executa se o Optional tiver valor, ou seja,
+        // se o usuário preencheu e confirmou a caixinha de nome.
         botaoNova.setOnAction(e ->
                 pedirNome("Nova categoria", "").ifPresent(nome -> {
                     if (executar(() -> categoriaService.criar(nome))) {
@@ -212,11 +222,16 @@ public class MainController {
             }
             boolean confirmou = Alertas.confirmar(
                     "Tem certeza que deseja excluir a categoria \"" + escolhida.getNome() + "\"?");
+            // O && só avalia o executar se o usuário confirmou. Se confirmou for false, o
+            // Java nem chega a chamar o executar (avaliação em curto-circuito).
             if (confirmou && executar(() -> categoriaService.excluir(escolhida.getId()))) {
                 recarregarLista.run();
             }
         });
 
+        // HBox coloca os componentes lado a lado (8 é o espaço entre eles) e VBox
+        // empilha na vertical. O showAndWait abre a janela e pausa o método até ela ser
+        // fechada. Só depois disso as linhas seguintes executam.
         HBox botoes = new HBox(8, botaoNova, botaoRenomear, botaoExcluir);
         dialogo.getDialogPane().setContent(new VBox(8, lista, botoes));
         dialogo.showAndWait();
@@ -242,6 +257,8 @@ public class MainController {
         comNulo.add(null);
         comNulo.addAll(categorias);
 
+        // observableArrayList cria uma lista que o ComboBox e a ListView conseguem
+        // observar, que é o tipo que o setItems espera.
         comboFiltroCategoria.setItems(FXCollections.observableArrayList(comNulo));
         comboCategoria.setItems(FXCollections.observableArrayList(comNulo));
 
@@ -251,6 +268,8 @@ public class MainController {
 
     /** Seleciona o item se ele ainda existir no combo; senão, o primeiro (o null). */
     private void selecionarOuPrimeiro(ComboBox<Categoria> combo, Categoria desejada) {
+        // O contains usa o equals da Categoria (que compara pelo id) para saber se o
+        // item ainda está na lista do combo.
         if (desejada != null && combo.getItems().contains(desejada)) {
             combo.getSelectionModel().select(desejada);
         } else {
@@ -291,6 +310,8 @@ public class MainController {
     /** Seleciona na lista a nota com este id (se ela estiver na lista atual). */
     private void selecionarNotaPorId(int id) {
         for (Nota n : listaNotas.getItems()) {
+            // getId() devolve Integer e o id é int. O Java converte o Integer em número
+            // antes de comparar (unboxing), então o == compara os valores mesmo.
             if (n.getId() == id) {
                 listaNotas.getSelectionModel().select(n);
                 return;
@@ -300,6 +321,10 @@ public class MainController {
 
     /** Célula de combo que mostra um texto especial quando o item é null. */
     private ListCell<Categoria> criarCelulaCategoria(String textoParaNulo) {
+        // new ListCell<>() { ... } é uma classe anônima: uma subclasse de ListCell sem
+        // nome, criada só para sobrescrever o updateItem. O JavaFX chama o updateItem
+        // toda vez que precisa desenhar a célula, e "vazio" é true nas linhas sem item.
+        // O super.updateItem mantém o comportamento original da ListCell.
         return new ListCell<>() {
             @Override
             protected void updateItem(Categoria item, boolean vazio) {
@@ -307,6 +332,8 @@ public class MainController {
                 if (vazio) {
                     setText(null);
                 } else {
+                    // Operador ternário: um if/else em uma linha. Se o item é null, usa
+                    // o texto especial; senão, o nome da categoria.
                     setText(item == null ? textoParaNulo : item.getNome());
                 }
             }
@@ -325,6 +352,7 @@ public class MainController {
                     return;
                 }
 
+                // setStyle aplica CSS direto no componente, escrito como texto.
                 Label titulo = new Label(nota.getTitulo());
                 titulo.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
@@ -332,6 +360,8 @@ public class MainController {
                         + "  •  Editada: " + formatarData(nota.getDataEdicao()));
                 datas.setStyle("-fx-font-size: 11px; -fx-opacity: 0.7;");
 
+                // setGraphic coloca um componente dentro da célula, no lugar do texto
+                // simples. Por isso o setText(null).
                 setText(null);
                 // Linha de cima: título + etiqueta da categoria lado a lado.
                 HBox linhaTitulo = new HBox(8, titulo, criarEtiquetaCategoria(nota.getCategoria()));
@@ -370,12 +400,15 @@ public class MainController {
                 + "  •  Editada em " + formatarData(nota.getDataEdicao()));
     }
 
+    // Se a data for null (nota sem data), mostra um traço em vez de dar erro.
     private String formatarData(LocalDateTime data) {
         return data == null ? "—" : data.format(FORMATO_DATA);
     }
 
     /** Abre uma caixinha pedindo um nome ao usuário. */
     private Optional<String> pedirNome(String titulo, String valorInicial) {
+        // TextInputDialog é um pop-up com um campo de texto. O showAndWait devolve um
+        // Optional: só tem valor se o usuário clicou em OK, e vem vazio se cancelou.
         TextInputDialog dialogo = new TextInputDialog(valorInicial);
         dialogo.setTitle(titulo);
         dialogo.setHeaderText(titulo);
@@ -388,6 +421,8 @@ public class MainController {
      * Devolve true se deu certo.
      */
     private boolean executar(Runnable acao) {
+        // Recebe a ação como Runnable (um bloco de código) e roda com acao.run() dentro
+        // do try/catch. Assim o tratamento de erro fica em um lugar só.
         try {
             acao.run();
             return true;
